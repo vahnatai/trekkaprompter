@@ -28,7 +28,7 @@ def get_substring_after(source, prefix):
 def describe(page) :
     infobox = page.content['infobox']
     lines = infobox.split('\n')
-    ep_data = lines[1].split(', Episode ')
+    ep_data = lines[0].split(', Episode ')
     if len(ep_data) == 2 :  # episode
         [series, episode_num] = ep_data
         print('{0} {1} "{2}"'.format(series, episode_num, page.title.replace(EP_TITLE_MARKER, '')))
