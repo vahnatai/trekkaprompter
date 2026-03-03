@@ -1,5 +1,6 @@
 import argparse
 import fandom
+import re
 import sys
 import traceback
 
@@ -8,9 +9,6 @@ fandom.set_lang('en')
 
 EP_TITLE_MARKER = ' (episode)'
 DEFAULT_COUNT = 4
-NEXT_RELEASE_START_TOKEN = 'released in all'
-NEXT_RELEASE_TITLE_START_TOKEN = 'title="'
-NEXT_RELEASE_TITLE_END_TOKEN = '"'
 FIRST_EP_NAME = 'The Man Trap (episode)'
 
 argp = argparse.ArgumentParser(
@@ -20,37 +18,24 @@ argp = argparse.ArgumentParser(
 argp.add_argument('page_title', type=str, nargs="?")
 argp.add_argument('count', type=int, nargs="?", default=DEFAULT_COUNT)
 
-def get_substring_before(source, prefix):
-    return source[:source.find(prefix)]
-
-def get_substring_after(source, prefix):
-    return source[source.find(prefix)+len(prefix):]
-
 def describe(page) :
     infobox = page.content['infobox']
-    lines = infobox.split('\n')
-    ep_data = lines[0].split(', Episode ')
-    if len(ep_data) == 2 :  # episode
-        [series, episode_num] = ep_data
+    first_line, _, remainder = infobox.partition('\n')
+    episode_match = re.compile(r'^(.*), Episode (.*)$').match(first_line)
+    if episode_match :  # episode
+        series, episode_num = episode_match.groups()
         print('{0} {1} "{2}"'.format(series, episode_num, page.title.replace(EP_TITLE_MARKER, '')))
     else :                  # movie?
-        show_name = lines[1]
+        show_name, _, _ = remainder.partition('\n')
         print('{0} "{1}"'.format(show_name, page.title.replace(EP_TITLE_MARKER, '')))
     sys.stdout.flush()
 
 def get_next_released(page) :
-    next_title = get_substring_before(
-        get_substring_after(
-            get_substring_after(
-                page.html,
-                NEXT_RELEASE_START_TOKEN
-            ),
-            NEXT_RELEASE_TITLE_START_TOKEN
-        ),
-        NEXT_RELEASE_TITLE_END_TOKEN
-    )
-    next = fandom.page(next_title)
-    return next
+    match = re.compile(r'released in all.*?title="([^"]+)"', re.DOTALL).search(page.html)
+    if match:
+        next_title = match.group(1)
+        return fandom.page(next_title)
+    raise ValueError(f"Could not find next episode in release order")
 
 if __name__ == '__main__' :
     args = argp.parse_args()
