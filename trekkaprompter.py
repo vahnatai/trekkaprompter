@@ -59,7 +59,11 @@ if __name__ == '__main__' :
         except :
             pass
     if not page :
-        page = fandom.page(page_title)
+        try :
+            page = fandom.page(page_title)
+        except fandom.error.PageError as e :
+            print(e)
+            exit()
 
     for i in range(count) :
         try :
