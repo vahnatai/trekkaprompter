@@ -56,7 +56,7 @@ if __name__ == '__main__' :
     if not page_title.endswith(EP_TITLE_MARKER) :
         try :
             page = fandom.page(page_title + EP_TITLE_MARKER)
-        except :
+        except Exception :
             pass
     if page is None:
         try :
