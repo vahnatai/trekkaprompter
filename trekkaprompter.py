@@ -63,7 +63,7 @@ if __name__ == '__main__' :
             page = fandom.page(page_title)
         except fandom.error.PageError as e :
             print(e)
-            exit()
+            sys.exit(1)
 
     for i in range(count) :
         try :
@@ -72,4 +72,4 @@ if __name__ == '__main__' :
         except Exception as e :
             print('Exception:', e)
             traceback.print_exception(e)
-            exit()
+            sys.exit(1)
