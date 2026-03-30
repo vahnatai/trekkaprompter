@@ -58,7 +58,7 @@ if __name__ == '__main__' :
             page = fandom.page(page_title + EP_TITLE_MARKER)
         except :
             pass
-    if not page :
+    if page is None:
         try :
             page = fandom.page(page_title)
         except fandom.error.PageError as e :
