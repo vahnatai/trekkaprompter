@@ -24,11 +24,11 @@ def describe(page) :
     episode_match = re.compile(r'^(.*), Episode (.*)$').match(first_line)
     if episode_match :  # episode
         series, episode_num = episode_match.groups()
-        print('{0} {1} "{2}"'.format(series, episode_num, page.title.replace(EP_TITLE_MARKER, '')))
+        print(f'{series} {episode_num} "{page.title.replace(EP_TITLE_MARKER, "")}"')
     else :                  # movie?
         movie_num_line = remainder.split('\n')[1]
         movie_num = re.compile(r'(?:← )?(\d+)(?:st|nd|rd|th) of ').match(movie_num_line).group(1)
-        print('FLM {0} "{1}"'.format(movie_num, page.title))
+        print(f'FLM {movie_num} "{page.title}"')
     sys.stdout.flush()
 
 def get_next_released(page) :
