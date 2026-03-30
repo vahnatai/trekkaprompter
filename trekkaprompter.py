@@ -36,7 +36,7 @@ def get_next_released(page) :
     if match:
         next_title = match.group(1)
         return fandom.page(next_title)
-    raise ValueError(f"Could not find next episode in release order")
+    raise ValueError("Could not find next episode in release order")
 
 if __name__ == '__main__' :
     args = argp.parse_args()
