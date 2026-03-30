@@ -65,7 +65,7 @@ if __name__ == '__main__' :
             print(e)
             sys.exit(1)
 
-    for i in range(count) :
+    for _ in range(count) :
         try :
             page = get_next_released(page)
             describe(page)
