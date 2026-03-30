@@ -11,6 +11,10 @@ EP_TITLE_MARKER = ' (episode)'
 DEFAULT_COUNT = 4
 FIRST_EP_NAME = 'The Man Trap (episode)'
 
+EPISODE_RE = re.compile(r'^(.*), Episode (.*)$')
+MOVIE_NUM_RE = re.compile(r'(?:← )?(\d+)(?:st|nd|rd|th) of ')
+NEXT_RELEASED_RE = re.compile(r'released in all.*?title="([^"]+)"', re.DOTALL)
+
 argp = argparse.ArgumentParser(
     prog='trekkaprompter',
     description='calculates watch orders for Star Trek by scraping the Memory Alpha fandom wiki'
@@ -21,18 +25,18 @@ argp.add_argument('count', type=int, nargs="?", default=DEFAULT_COUNT)
 def describe(page) :
     infobox = page.content['infobox']
     first_line, _, remainder = infobox.partition('\n')
-    episode_match = re.compile(r'^(.*), Episode (.*)$').match(first_line)
+    episode_match = EPISODE_RE.match(first_line)
     if episode_match :  # episode
         series, episode_num = episode_match.groups()
         print(f'{series} {episode_num} "{page.title.replace(EP_TITLE_MARKER, "")}"')
     else :                  # movie?
         movie_num_line = remainder.split('\n')[1]
-        movie_num = re.compile(r'(?:← )?(\d+)(?:st|nd|rd|th) of ').match(movie_num_line).group(1)
+        movie_num = MOVIE_NUM_RE.match(movie_num_line).group(1)
         print(f'FLM {movie_num} "{page.title}"')
     sys.stdout.flush()
 
 def get_next_released(page) :
-    match = re.compile(r'released in all.*?title="([^"]+)"', re.DOTALL).search(page.html)
+    match = NEXT_RELEASED_RE.search(page.html)
     if match:
         next_title = match.group(1)
         return fandom.page(next_title)
